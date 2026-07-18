@@ -577,7 +577,8 @@ export const init = async (): Promise<void> => {
     await waitForAnyKey();
     window.requestAnimationFrame(gameLoop);
 
-    startRace(hasTouchControls);
+    // The custom home screen is now the single start step on every device.
+    startRace(true);
 
     await audioInitialization;
     playTune(

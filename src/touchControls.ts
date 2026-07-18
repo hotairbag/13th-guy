@@ -21,11 +21,17 @@ const touchCapable =
     navigator.maxTouchPoints > 0 ||
     window.matchMedia("(hover: none), (pointer: coarse)").matches;
 
-touchControls.style.display = touchCapable ? "block" : "none";
+// Keep the shared home-screen CTA available with either touch or a mouse.
+// The joystick and in-race action button remain touch-only below.
+touchControls.style.display = "block";
 
 export const setActionButtonVisible = (visible: boolean): void => {
-    actionButton.classList.toggle("is-hidden", !visible);
-    actionButton.disabled = !visible;
+    const homeVisible =
+        document.documentElement.classList.contains("home-active");
+    const shouldShow = visible && (touchCapable || homeVisible);
+
+    actionButton.classList.toggle("is-hidden", !shouldShow);
+    actionButton.disabled = !shouldShow;
 };
 
 export const setHomeScreenVisible = (
@@ -43,7 +49,7 @@ export const setHomeScreenVisible = (
         ? "Entering the starting grid…"
         : touchCapable
           ? "Tap START to enter the race."
-          : "Press any key to enter the race.";
+          : "Click START or press any key to enter the race.";
 
     // The home screen owns its CTA state. This prevents a hidden/disabled
     // button from leaking in from gameplay, a respawn ad, or the loss screen.
@@ -60,8 +66,9 @@ const resetJoystick = (): void => {
 };
 
 export const setJoystickVisible = (visible: boolean): void => {
-    joystick.classList.toggle("is-hidden", !visible);
-    if (!visible) resetJoystick();
+    const shouldShow = visible && touchCapable;
+    joystick.classList.toggle("is-hidden", !shouldShow);
+    if (!shouldShow) resetJoystick();
 };
 
 setHomeScreenVisible(true);
