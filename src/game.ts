@@ -27,7 +27,7 @@ import {
     renderCharacter,
 } from "./CharacterAnimation.js";
 import { playerColor } from "./Character.js";
-import { setActionButtonVisible } from "./touchControls";
+import { setActionButtonVisible, setStartBrandVisible } from "./touchControls";
 
 const TIME_STEP = 1000 / 60;
 const MAX_FRAME = TIME_STEP * 5;
@@ -77,6 +77,7 @@ const setState = (state: GameState): void => {
             state === GameState.GameOver ||
             (state === GameState.GameFinished && level.characters.length <= 14),
     );
+    setStartBrandVisible(state === GameState.Start);
 
     if (state !== GameState.GameFinished) hideAdPreview();
 

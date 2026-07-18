@@ -12,6 +12,9 @@ const actionButton = document.querySelector(
 const touchControls = document.querySelector(
     "#touch-controls",
 ) as HTMLDivElement;
+const publisherLogo = document.querySelector(
+    "#publisher-logo",
+) as HTMLDivElement;
 
 const touchCapable =
     navigator.maxTouchPoints > 0 ||
@@ -22,6 +25,10 @@ touchControls.style.display = touchCapable ? "block" : "none";
 export const setActionButtonVisible = (visible: boolean): void => {
     actionButton.classList.toggle("is-hidden", !visible);
     actionButton.disabled = !visible;
+};
+
+export const setStartBrandVisible = (visible: boolean): void => {
+    publisherLogo.classList.toggle("is-hidden", !visible);
 };
 
 let activePointer: number | null = null;
