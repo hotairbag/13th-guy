@@ -8,26 +8,35 @@ const contentTypes = {
     ".css": "text/css; charset=utf-8",
     ".html": "text/html; charset=utf-8",
     ".js": "text/javascript; charset=utf-8",
+    ".png": "image/png",
     ".svg": "image/svg+xml; charset=utf-8",
 };
 
 const assetPaths = [
     "index.html",
     "icon.svg",
+    "publishox-logo.png",
     "assets/index.css",
     "assets/index.js",
 ];
 
 const assets = Object.fromEntries(
-    assetPaths.map((assetPath) => [
-        `/${assetPath}`,
-        {
-            body: fs.readFileSync(path.join("dist", assetPath), "utf8"),
-            contentType:
-                contentTypes[path.extname(assetPath)] ??
-                "application/octet-stream",
-        },
-    ]),
+    assetPaths.map((assetPath) => {
+        const extension = path.extname(assetPath);
+        const isBinary = extension === ".png";
+
+        return [
+            `/${assetPath}`,
+            {
+                body: fs
+                    .readFileSync(path.join("dist", assetPath))
+                    .toString(isBinary ? "base64" : "utf8"),
+                contentType:
+                    contentTypes[extension] ?? "application/octet-stream",
+                encoding: isBinary ? "base64" : "text",
+            },
+        ];
+    }),
 );
 
 for (const assetPath of assetPaths) {
@@ -62,7 +71,11 @@ export default {
 
         if (!asset) return notFound();
 
-        return new Response(request.method === "HEAD" ? null : asset.body, {
+        const body = asset.encoding === "base64"
+            ? Uint8Array.from(atob(asset.body), (character) => character.charCodeAt(0))
+            : asset.body;
+
+        return new Response(request.method === "HEAD" ? null : body, {
             headers: {
                 "Content-Type": asset.contentType,
                 "Cache-Control": pathname === "/index.html"
