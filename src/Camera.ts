@@ -58,7 +58,14 @@ export class Camera {
 
     update(): void {
         if (this.visibleAreaHeight != null) {
-            this.zoom = this.view.height / this.visibleAreaHeight;
+            const isPortrait = this.view.height > this.view.width;
+
+            // Portrait keeps the original horizontal field of view. The extra
+            // height is therefore real course space instead of a stretched or
+            // cropped landscape frame.
+            this.zoom = isPortrait
+                ? (this.view.width / (16 / 9) / this.visibleAreaHeight) * 1.22
+                : this.view.height / this.visibleAreaHeight;
         }
 
         if (this.target) {
@@ -88,9 +95,19 @@ export class Camera {
             this.x = 0;
         }
 
-        let y = o.y + o.height;
-        // Characted should be 1/4 height from bottom
-        y -= viewAreaHeight / 4;
+        let y: number;
+
+        if (this.view.height > this.view.width && this.visibleAreaHeight) {
+            // Cap how far the player can see ahead to approximately the
+            // landscape amount. All additional portrait space is revealed
+            // below/behind the runner instead.
+            const aheadDistance = this.visibleAreaHeight * 0.68;
+            y = o.y + o.height + viewAreaHeight / 2 - aheadDistance;
+        } else {
+            y = o.y + o.height;
+            // Character should be 1/4 height from bottom.
+            y -= viewAreaHeight / 4;
+        }
 
         this.y = y;
     }

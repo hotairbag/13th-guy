@@ -29,10 +29,41 @@ import { init } from "./game";
 
 const maxWidth = 1280;
 const maxHeight = 720;
+const aspectRatio = maxWidth / maxHeight;
+const bannerAd = document.querySelector("#banner-ad") as HTMLElement;
+
+const hasTouchInput = (): boolean =>
+    navigator.maxTouchPoints > 0 ||
+    window.matchMedia("(hover: none), (pointer: coarse)").matches;
 
 const resize = (): void => {
-    // Calculate the aspect ratio
-    const aspectRatio = maxWidth / maxHeight;
+    const isMobilePortrait =
+        hasTouchInput() && window.innerHeight > window.innerWidth;
+
+    document.documentElement.classList.toggle(
+        "mobile-portrait",
+        isMobilePortrait,
+    );
+
+    if (isMobilePortrait) {
+        const bannerHeight = bannerAd.getBoundingClientRect().height;
+        const width = Math.max(1, Math.floor(window.innerWidth));
+        const height = Math.max(
+            1,
+            Math.floor(window.innerHeight - bannerHeight),
+        );
+
+        canvas.width = width;
+        canvas.height = height;
+        canvas.style.position = "absolute";
+        canvas.style.left = "0";
+        canvas.style.top = `${bannerHeight}px`;
+        canvas.style.width = `${width}px`;
+        canvas.style.height = `${height}px`;
+        canvas.style.transform = "none";
+        canvas.style.transformOrigin = "top left";
+        return;
+    }
 
     // Calculate the width and height based on the window size while maintaining the aspect ratio
     let width = window.innerWidth;
@@ -67,6 +98,8 @@ const resize = (): void => {
     canvas.style.position = "absolute";
     canvas.style.left = `${(window.innerWidth - width * scale) / 2}px`;
     canvas.style.top = `${(window.innerHeight - height * scale) / 2}px`;
+    canvas.style.width = "";
+    canvas.style.height = "";
 
     // Apply the scaling
     canvas.style.transform = `scale(${scale})`;

@@ -19,6 +19,11 @@ const touchCapable =
 
 touchControls.style.display = touchCapable ? "block" : "none";
 
+export const setActionButtonVisible = (visible: boolean): void => {
+    actionButton.classList.toggle("is-hidden", !visible);
+    actionButton.disabled = !visible;
+};
+
 let activePointer: number | null = null;
 
 const resetJoystick = (): void => {

@@ -27,6 +27,7 @@ import {
     renderCharacter,
 } from "./CharacterAnimation.js";
 import { playerColor } from "./Character.js";
+import { setActionButtonVisible } from "./touchControls";
 
 const TIME_STEP = 1000 / 60;
 const MAX_FRAME = TIME_STEP * 5;
@@ -70,6 +71,12 @@ let radius = 0;
 
 const setState = (state: GameState): void => {
     gameState = state;
+
+    setActionButtonVisible(
+        state === GameState.Start ||
+            state === GameState.GameOver ||
+            (state === GameState.GameFinished && level.characters.length <= 14),
+    );
 
     if (state !== GameState.GameFinished) hideAdPreview();
 
@@ -161,7 +168,13 @@ const centerText = (
     cx.globalAlpha = alpha > 0 ? alpha : 0;
     cx.fillStyle = "white";
     cx.font = fontSize + "px " + fontName;
-    const textWidth = cx.measureText(text).width;
+    let textWidth = cx.measureText(text).width;
+    const maxTextWidth = Math.max(1, canvas.width - 32);
+    if (textWidth > maxTextWidth) {
+        fontSize *= maxTextWidth / textWidth;
+        cx.font = fontSize + "px " + fontName;
+        textWidth = cx.measureText(text).width;
+    }
     cx.fillText(
         text,
         (canvas.width - textWidth) / 2,

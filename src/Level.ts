@@ -489,9 +489,16 @@ export class Level implements Area {
         cx.restore();
 
         const gradient = cx.createLinearGradient(0, 0, 0, canvas.height);
+        const isPortrait = canvas.height > canvas.width;
         gradient.addColorStop(0, "rgba(0, 0, 0, 1)");
-        gradient.addColorStop(0.1, "rgba(0, 0, 0, 0.6)");
-        gradient.addColorStop(1, "rgba(0, 0, 0, 0)");
+        if (isPortrait) {
+            gradient.addColorStop(0.08, "rgba(0, 0, 0, 0.72)");
+            gradient.addColorStop(0.18, "rgba(0, 0, 0, 0.12)");
+            gradient.addColorStop(0.3, "rgba(0, 0, 0, 0)");
+        } else {
+            gradient.addColorStop(0.1, "rgba(0, 0, 0, 0.6)");
+            gradient.addColorStop(1, "rgba(0, 0, 0, 0)");
+        }
 
         cx.fillStyle = gradient;
         cx.fillRect(0, 0, canvas.width, canvas.height);
