@@ -584,8 +584,24 @@ export class Level implements Area {
                 );
             });
 
-            // Top status texts
-            cx.font = "4px Impact";
+            cx.restore(); // Character labels return to canvas coordinates.
+
+            // Keep the race status pinned to the top of the screen while the
+            // course and character labels continue to move with the camera.
+            const hudFontSize = Math.max(12, Math.min(20, canvas.width / 24));
+            const hudHeight = hudFontSize + 22;
+            const hudY = hudHeight / 2;
+            const hudPadding = Math.max(12, canvas.width * 0.035);
+
+            const hudGradient = cx.createLinearGradient(0, 0, 0, hudHeight);
+            hudGradient.addColorStop(0, "rgba(0, 0, 10, 0.92)");
+            hudGradient.addColorStop(1, "rgba(0, 0, 10, 0.62)");
+            cx.fillStyle = hudGradient;
+            cx.fillRect(0, 0, canvas.width, hudHeight);
+
+            cx.font = `700 ${hudFontSize}px Impact`;
+            cx.textBaseline = "middle";
+            cx.textAlign = "left";
             cx.fillStyle =
                 this.player.rank === 13
                     ? "red"
@@ -599,9 +615,11 @@ export class Level implements Area {
 
             cx.fillText(
                 "▲ " + this.player.rank + " / " + characters.length,
-                -42,
-                this.camera.y - 30,
+                hudPadding,
+                hudY,
             );
+
+            cx.textAlign = "center";
             cx.fillStyle = "green";
             cx.fillText(
                 "✪ " +
@@ -609,17 +627,17 @@ export class Level implements Area {
                     " / " +
                     (characters.length - 13) +
                     " QUALIFIED",
-                -15,
-                this.camera.y - 30,
+                canvas.width / 2,
+                hudY,
             );
+
+            cx.textAlign = "right";
             cx.fillStyle = "white";
             cx.fillText(
                 "❌ " + eliminatedCharactersCount + " / 13",
-                27,
-                this.camera.y - 30,
+                canvas.width - hudPadding,
+                hudY,
             );
         }
-
-        cx.restore(); // End camera - Drawing no longer in level coordinates
     }
 }
