@@ -35,7 +35,16 @@
                     finish thirteenth.
                 </p>
             </div>
-            <p id="home-screen-instruction">Tap START to enter the race.</p>
+            <div class="home-screen__footer">
+                <p id="home-screen-instruction">Tap START to enter the race.</p>
+                <button
+                    id="home-start-button"
+                    type="button"
+                    aria-label="Start game"
+                >
+                    START
+                </button>
+            </div>
         </section>
         <canvas aria-label="13th Guy game"></canvas>
         <div id="touch-controls" aria-label="Touch controls">
@@ -49,10 +58,11 @@
             </div>
             <button
                 id="action-button"
+                class="is-hidden"
                 type="button"
-                aria-label="Start game"
+                aria-label="Start or continue"
             >
-                START
+                GO
             </button>
         </div>
         <div

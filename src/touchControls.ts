@@ -16,19 +16,18 @@ const homeScreen = document.querySelector("#home-screen") as HTMLElement;
 const homeInstruction = document.querySelector(
     "#home-screen-instruction",
 ) as HTMLParagraphElement;
+const homeStartButton = document.querySelector(
+    "#home-start-button",
+) as HTMLButtonElement;
 
 const touchCapable =
     navigator.maxTouchPoints > 0 ||
     window.matchMedia("(hover: none), (pointer: coarse)").matches;
 
-// Keep the shared home-screen CTA available with either touch or a mouse.
-// The joystick and in-race action button remain touch-only below.
-touchControls.style.display = "block";
+touchControls.style.display = touchCapable ? "block" : "none";
 
 export const setActionButtonVisible = (visible: boolean): void => {
-    const homeVisible =
-        document.documentElement.classList.contains("home-active");
-    const shouldShow = visible && (touchCapable || homeVisible);
+    const shouldShow = visible && touchCapable;
 
     actionButton.classList.toggle("is-hidden", !shouldShow);
     actionButton.disabled = !shouldShow;
@@ -39,21 +38,16 @@ export const setHomeScreenVisible = (
     waiting = false,
 ): void => {
     homeScreen.classList.toggle("is-hidden", !visible);
-    document.documentElement.classList.toggle("home-active", visible);
-    actionButton.textContent = visible ? "START" : "GO";
-    actionButton.setAttribute(
-        "aria-label",
-        visible ? "Start game" : "Start or continue",
-    );
+    homeStartButton.classList.toggle("is-hidden", !visible || waiting);
+    homeStartButton.disabled = !visible || waiting;
     homeInstruction.textContent = waiting
         ? "Entering the starting grid…"
         : touchCapable
           ? "Tap START to enter the race."
           : "Click START or press any key to enter the race.";
 
-    // The home screen owns its CTA state. This prevents a hidden/disabled
-    // button from leaking in from gameplay, a respawn ad, or the loss screen.
-    if (visible && !waiting) setActionButtonVisible(true);
+    // Never let the circular in-game control leak onto the home screen.
+    if (visible) setActionButtonVisible(false);
 };
 
 let activePointer: number | null = null;
@@ -117,6 +111,11 @@ joystick.addEventListener("pointercancel", releasePointer);
 joystick.addEventListener("lostpointercapture", resetJoystick);
 
 actionButton.addEventListener("click", (event) => {
+    event.preventDefault();
+    triggerVirtualAction();
+});
+
+homeStartButton.addEventListener("click", (event) => {
     event.preventDefault();
     triggerVirtualAction();
 });
