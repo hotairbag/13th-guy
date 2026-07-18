@@ -8,6 +8,7 @@
     "start": "vite",
     "build": "tsc && vite build",
     "postbuild": "roadroller dist/assets/index.js -o dist/assets/index.js && node createDeployPackage.js",
+    "build:sites": "npm run build && node prepareSitesBuild.js",
     "preview": "vite preview",
     "lint": "eslint ."
   },

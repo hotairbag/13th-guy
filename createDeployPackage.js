@@ -37,7 +37,7 @@ archive.pipe(output);
 
 fs.readdirSync("dist", { recursive: true, withFileTypes: true })
     .filter((dirent) => dirent.isFile())
-    .map((f) => path.join(f.path, f.name))
+    .map((f) => path.join(f.parentPath ?? f.path, f.name))
     .forEach((path) => {
         archive.append(fs.createReadStream(path), {
             name: path.replace(/dist(\\|\/)/, ""),

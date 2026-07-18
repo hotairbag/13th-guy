@@ -57,6 +57,13 @@ enum GameState {
 
 let gameState: GameState = GameState.Init;
 
+const hasTouchControls = window.matchMedia(
+    "(hover: none), (pointer: coarse)",
+).matches;
+
+const actionPrompt = (desktopPrompt: string): string =>
+    hasTouchControls ? "Tap GO" : desktopPrompt;
+
 // For drawing start- and game over screens.
 let radius = 0;
 
@@ -239,7 +246,13 @@ const draw = (t: number, dt: number): void => {
                 );
             }
             if (radius >= maxRadius) {
-                centerText("Press ENTER", 24, "Sans-serif", 1, 100);
+                centerText(
+                    actionPrompt("Press ENTER"),
+                    24,
+                    "Sans-serif",
+                    1,
+                    100,
+                );
             }
 
             if (radius < maxRadius) {
@@ -296,7 +309,13 @@ const draw = (t: number, dt: number): void => {
                         1,
                         60,
                     );
-                    centerText("Press ENTER", 32, "Sans-serif", 1, 120);
+                    centerText(
+                        actionPrompt("Press ENTER"),
+                        32,
+                        "Sans-serif",
+                        1,
+                        120,
+                    );
                 }
                 cx.save();
                 cx.translate(
@@ -429,10 +448,24 @@ const drawStartScreen = (t: number, wait: boolean, z: number): void => {
             1,
             20,
         );
-        centerText("⌨ W A S D ▲ ▼ ◄ ►", 24, "Sans-serif", 1, 80);
+        centerText(
+            hasTouchControls
+                ? "Drag the joystick to move"
+                : "⌨ W A S D ▲ ▼ ◄ ►",
+            24,
+            "Sans-serif",
+            1,
+            80,
+        );
     } else {
         Logo();
-        centerText("Press ENTER to start the race!", 24, "Sans-serif", 1, 80);
+        centerText(
+            actionPrompt("Press ENTER to start the race!"),
+            24,
+            "Sans-serif",
+            1,
+            80,
+        );
     }
     cx.restore();
 
@@ -479,7 +512,7 @@ export const init = async (): Promise<void> => {
     drawInitialScreen();
 
     await initialize().then(() =>
-        centerText("Press any key", 24, "Sans-serif", 1, 80),
+        centerText(actionPrompt("Press any key"), 24, "Sans-serif", 1, 80),
     );
     cx.restore();
     await waitForAnyKey();

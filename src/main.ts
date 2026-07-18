@@ -23,6 +23,7 @@
  */
 
 import "./style.css";
+import "./touchControls";
 import { canvas } from "./graphics";
 import { init } from "./game";
 

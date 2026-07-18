@@ -58,6 +58,10 @@ const createKeys = (): KeysMutable => ({
 
 let keys: KeysMutable = createKeys();
 
+type ActionListener = () => void;
+
+const actionListeners = new Set<ActionListener>();
+
 const onKeyDown = (event: KeyboardEvent): void => {
     if (event.code in keys) {
         keys[event.code as Key] = true;
@@ -78,16 +82,49 @@ export const initializeKeyboard = (): void => {
     });
 };
 
-export const waitForAnyKey = (): Promise<void> => {
+export const setVirtualDirection = (x: number, y: number): void => {
+    const deadZone = 0.22;
+
+    keys.ArrowLeft = x < -deadZone;
+    keys.ArrowRight = x > deadZone;
+    keys.ArrowUp = y < -deadZone;
+    keys.ArrowDown = y > deadZone;
+};
+
+export const releaseVirtualDirection = (): void => {
+    keys.ArrowLeft = false;
+    keys.ArrowRight = false;
+    keys.ArrowUp = false;
+    keys.ArrowDown = false;
+};
+
+export const triggerVirtualAction = (): void => {
+    playTune(SFX_KB);
+    actionListeners.forEach((listener) => listener());
+};
+
+const waitForInput = (enterOnly: boolean): Promise<void> => {
     return new Promise((resolve) => {
-        const listener = (): void => {
-            playTune(SFX_KB);
-            window.removeEventListener("keydown", listener);
+        const finish = (): void => {
+            window.removeEventListener("keydown", keyboardListener);
+            actionListeners.delete(actionListener);
             resolve();
         };
+        const keyboardListener = (event: KeyboardEvent): void => {
+            if (!enterOnly || event.code === "Enter") {
+                playTune(SFX_KB);
+                finish();
+            }
+        };
+        const actionListener = (): void => finish();
 
-        window.addEventListener("keydown", listener);
+        window.addEventListener("keydown", keyboardListener);
+        actionListeners.add(actionListener);
     });
+};
+
+export const waitForAnyKey = (): Promise<void> => {
+    return waitForInput(false);
 };
 
 export const sleep = (ms: number) => {
@@ -95,17 +132,7 @@ export const sleep = (ms: number) => {
 };
 
 export const waitForEnter = (): Promise<void> => {
-    return new Promise((resolve) => {
-        const listener = (event: KeyboardEvent): void => {
-            if (event.code === "Enter") {
-                playTune(SFX_KB);
-                window.removeEventListener("keydown", listener);
-                resolve();
-            }
-        };
-
-        window.addEventListener("keydown", listener);
-    });
+    return waitForInput(true);
 };
 
 export const getKeys = (): Keys => keys;
