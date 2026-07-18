@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
+fs.mkdirSync("dist/client", { recursive: true });
 fs.mkdirSync("dist/server", { recursive: true });
 
 const contentTypes = {
@@ -28,6 +29,19 @@ const assets = Object.fromEntries(
         },
     ]),
 );
+
+for (const assetPath of assetPaths) {
+    const source = path.join("dist", assetPath);
+    const destination = path.join("dist", "client", assetPath);
+    fs.mkdirSync(path.dirname(destination), { recursive: true });
+    fs.copyFileSync(source, destination);
+}
+
+fs.writeFileSync(
+    "dist/client/_headers",
+    "/assets/*\n  Cache-Control: public, max-age=31536000, immutable\n",
+);
+fs.writeFileSync("dist/client/.assetsignore", "wrangler.json\n.dev.vars\n");
 
 const workerSource = `const assets = ${JSON.stringify(assets)};
 
@@ -62,3 +76,18 @@ export default {
 `;
 
 fs.writeFileSync("dist/server/index.js", workerSource);
+fs.writeFileSync(
+    "dist/server/wrangler.json",
+    JSON.stringify({
+        topLevelName: "mobile-13th-guy",
+        name: "mobile-13th-guy",
+        compatibility_date: "2026-05-15",
+        compatibility_flags: ["nodejs_compat"],
+        vars: {},
+        main: "index.js",
+        rules: [{ type: "ESModule", globs: ["**/*.js", "**/*.mjs"] }],
+        no_bundle: true,
+        assets: { directory: "../client" },
+        observability: { enabled: true },
+    }),
+);
