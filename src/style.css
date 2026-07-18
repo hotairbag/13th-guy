@@ -21,7 +21,7 @@ canvas {
 }
 
 #touch-controls {
-    display: none;
+    display: block;
     position: fixed;
     inset: 0;
     z-index: 10;
@@ -88,12 +88,6 @@ canvas {
 #action-button:active {
     background: rgba(205, 211, 218, 0.52);
     transform: scale(0.94);
-}
-
-@media (hover: none), (pointer: coarse) {
-    #touch-controls {
-        display: block;
-    }
 }
 
 @media (max-height: 430px) {

@@ -9,6 +9,15 @@ const knob = document.querySelector("#joystick-knob") as HTMLDivElement;
 const actionButton = document.querySelector(
     "#action-button",
 ) as HTMLButtonElement;
+const touchControls = document.querySelector(
+    "#touch-controls",
+) as HTMLDivElement;
+
+const touchCapable =
+    navigator.maxTouchPoints > 0 ||
+    window.matchMedia("(hover: none), (pointer: coarse)").matches;
+
+touchControls.style.display = touchCapable ? "block" : "none";
 
 let activePointer: number | null = null;
 

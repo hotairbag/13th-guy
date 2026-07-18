@@ -58,9 +58,9 @@ enum GameState {
 
 let gameState: GameState = GameState.Init;
 
-const hasTouchControls = window.matchMedia(
-    "(hover: none), (pointer: coarse)",
-).matches;
+const hasTouchControls =
+    navigator.maxTouchPoints > 0 ||
+    window.matchMedia("(hover: none), (pointer: coarse)").matches;
 
 const actionPrompt = (desktopPrompt: string): string =>
     hasTouchControls ? "Tap GO" : desktopPrompt;
@@ -496,7 +496,7 @@ const drawInitialScreen = (): void => {
     cx.restore();
     Logo();
     applyGradient();
-    applyCRTEffect();
+    if (!hasTouchControls) applyCRTEffect();
 };
 
 export const startRace = async (skipStartPrompt = false): Promise<void> => {
@@ -506,22 +506,30 @@ export const startRace = async (skipStartPrompt = false): Promise<void> => {
     if (!skipStartPrompt) await waitForEnter();
     setState(GameState.Wait);
 
-    setTimeout(() => {
-        setState(GameState.Ready);
-    }, 2400);
+    setTimeout(
+        () => {
+            setState(GameState.Ready);
+        },
+        hasTouchControls ? 800 : 2400,
+    );
 };
 
 export const init = async (): Promise<void> => {
     initializeKeyboard();
     drawInitialScreen();
 
-    await initialize().then(() =>
-        centerText(actionPrompt("Press any key"), 24, "Sans-serif", 1, 80),
-    );
+    const audioInitialization = initialize();
+    centerText(actionPrompt("Press any key"), 24, "Sans-serif", 1, 80);
     cx.restore();
     await waitForAnyKey();
-    playTune(SFX_START);
     window.requestAnimationFrame(gameLoop);
 
     startRace(hasTouchControls);
+
+    await audioInitialization;
+    playTune(
+        gameState === GameState.Ready || gameState === GameState.Running
+            ? SFX_RACE
+            : SFX_START,
+    );
 };

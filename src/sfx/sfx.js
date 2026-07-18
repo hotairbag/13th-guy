@@ -50,6 +50,7 @@ const hitFx = document.createElement("audio");
 const kbFx = document.createElement("audio");
 const finishFx = document.createElement("audio");
 const gameoverFx = document.createElement("audio");
+let audioReady = false;
 
 export const initMusicPlayer = (audioTrack, tune, isLooped) => {
     return new Promise((resolve) => {
@@ -85,7 +86,9 @@ export const initialize = () => {
         initMusicPlayer(kbFx, kbSfx, false),
         initMusicPlayer(finishFx, finishSfx, false),
         initMusicPlayer(gameoverFx, gameoverSfx, false),
-    ]);
+    ]).then(() => {
+        audioReady = true;
+    });
 };
 
 const FadeOut = (tune, vol = 0) => {
@@ -141,6 +144,8 @@ const FadeOutIn = (tune1, tune2) => {
 };
 
 export const playTune = (tune, vol = 1) => {
+    if (!audioReady) return;
+
     switch (tune) {
         case SFX_RACE: {
             raceTune.currentTime = 0;
