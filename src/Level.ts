@@ -590,14 +590,20 @@ export class Level implements Area {
             // course and character labels continue to move with the camera.
             const hudFontSize = Math.max(12, Math.min(20, canvas.width / 24));
             const hudHeight = hudFontSize + 22;
-            const hudY = hudHeight / 2;
+            const hudTop = canvas.height > canvas.width ? 18 : 0;
+            const hudY = hudTop + hudHeight / 2;
             const hudPadding = Math.max(12, canvas.width * 0.035);
 
-            const hudGradient = cx.createLinearGradient(0, 0, 0, hudHeight);
+            const hudGradient = cx.createLinearGradient(
+                0,
+                hudTop,
+                0,
+                hudTop + hudHeight,
+            );
             hudGradient.addColorStop(0, "rgba(0, 0, 10, 0.92)");
             hudGradient.addColorStop(1, "rgba(0, 0, 10, 0.62)");
             cx.fillStyle = hudGradient;
-            cx.fillRect(0, 0, canvas.width, hudHeight);
+            cx.fillRect(0, hudTop, canvas.width, hudHeight);
 
             cx.font = `700 ${hudFontSize}px Impact`;
             cx.textBaseline = "middle";
