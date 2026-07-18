@@ -57,11 +57,14 @@ enum GameState {
     Wait,
     Ready,
     Running,
+    RespawnAd,
     GameOver,
     GameFinished,
 }
 
 let gameState: GameState = GameState.Init;
+let playerWasFalling = false;
+let respawnPauseTime = 0;
 
 const hasTouchControls =
     navigator.maxTouchPoints > 0 ||
@@ -89,12 +92,15 @@ const setState = (state: GameState): void => {
         state === GameState.Ready || state === GameState.Running,
     );
 
-    if (state !== GameState.GameFinished) hideAdPreview();
+    if (state !== GameState.GameFinished && state !== GameState.RespawnAd) {
+        hideAdPreview();
+    }
 
     switch (state) {
         case GameState.Start:
             break;
         case GameState.Ready:
+            playerWasFalling = false;
             if (raceNumber > 1 && !level.player.eliminated) {
                 const track = raceNumber === 3 ? thirdTrack : secondTrack;
                 level = new Level(
@@ -117,6 +123,14 @@ const setState = (state: GameState): void => {
             break;
         case GameState.Running:
             break;
+        case GameState.RespawnAd:
+            showAdPreview({
+                duration: 5000,
+                context: "RESPAWN BREAK",
+                countdownLabel: "RESPAWNING IN",
+                onComplete: () => setState(GameState.Running),
+            });
+            break;
         case GameState.GameOver:
             radius = 1;
             playTune(SFX_GAMEOVER);
@@ -129,7 +143,10 @@ const setState = (state: GameState): void => {
             break;
         case GameState.GameFinished:
             playTune(SFX_FINISHED);
-            showAdPreview();
+            showAdPreview({
+                context: "ROUND BREAK",
+                countdownLabel: "NEXT ROUND IN",
+            });
             // Players left for next round?
             if (level.characters.length > 14) {
                 sleep(8000).then(() => setState(GameState.Ready));
@@ -156,6 +173,17 @@ const update = (t: number, dt: number): void => {
     switch (gameState) {
         case GameState.Running: {
             level.update(t, dt);
+            const playerIsFalling = level.player.fallStartTime != null;
+
+            if (playerIsFalling && !playerWasFalling) {
+                playerWasFalling = true;
+                respawnPauseTime = t;
+                setState(GameState.RespawnAd);
+                break;
+            }
+
+            if (!playerIsFalling) playerWasFalling = false;
+
             if (level.state === State.GAME_OVER) {
                 setState(GameState.GameOver);
             } else if (level.state === State.FINISHED) {
@@ -198,7 +226,8 @@ const draw = (t: number, dt: number): void => {
     cx.save();
     cx.fillStyle = "rgb(0, 0, 10)";
     cx.fillRect(0, 0, canvas.width, canvas.height);
-    level?.draw(t, dt);
+    const renderTime = gameState === GameState.RespawnAd ? respawnPauseTime : t;
+    level?.draw(renderTime, gameState === GameState.RespawnAd ? 0 : dt);
     cx.restore();
 
     cx.save();
