@@ -14,7 +14,8 @@ To run the game in the browser for development:
 
 On desktop, move with WASD or the arrow keys and press Enter to start. On a
 touchscreen, use the virtual joystick to move and the GO button to start,
-continue, or restart.
+continue, or restart. A clearly labeled demo ad placement appears briefly
+between completed rounds.
 
 Building the zip package:
 

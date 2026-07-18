@@ -7,6 +7,7 @@ import {
 } from "./keyboard";
 import { Level, State } from "./Level";
 import { thirdTrack, secondTrack, simpleTrack } from "./tracks";
+import { hideAdPreview, showAdPreview } from "./adPreview";
 
 import {
     initialize,
@@ -70,6 +71,8 @@ let radius = 0;
 const setState = (state: GameState): void => {
     gameState = state;
 
+    if (state !== GameState.GameFinished) hideAdPreview();
+
     switch (state) {
         case GameState.Start:
             break;
@@ -108,6 +111,7 @@ const setState = (state: GameState): void => {
             break;
         case GameState.GameFinished:
             playTune(SFX_FINISHED);
+            showAdPreview();
             // Players left for next round?
             if (level.characters.length > 14) {
                 sleep(8000).then(() => setState(GameState.Ready));
