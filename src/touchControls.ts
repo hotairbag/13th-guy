@@ -61,7 +61,7 @@ joystick.addEventListener("pointerup", releasePointer);
 joystick.addEventListener("pointercancel", releasePointer);
 joystick.addEventListener("lostpointercapture", resetJoystick);
 
-actionButton.addEventListener("pointerdown", (event) => {
+actionButton.addEventListener("click", (event) => {
     event.preventDefault();
     triggerVirtualAction();
 });

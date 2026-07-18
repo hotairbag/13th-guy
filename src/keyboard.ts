@@ -61,6 +61,8 @@ let keys: KeysMutable = createKeys();
 type ActionListener = () => void;
 
 const actionListeners = new Set<ActionListener>();
+let hasRegisteredInputWaiter = false;
+let pendingInitialVirtualAction = false;
 
 const onKeyDown = (event: KeyboardEvent): void => {
     if (event.code in keys) {
@@ -99,6 +101,11 @@ export const releaseVirtualDirection = (): void => {
 };
 
 export const triggerVirtualAction = (): void => {
+    if (actionListeners.size === 0) {
+        if (!hasRegisteredInputWaiter) pendingInitialVirtualAction = true;
+        return;
+    }
+
     playTune(SFX_KB);
     actionListeners.forEach((listener) => listener());
 };
@@ -118,8 +125,14 @@ const waitForInput = (enterOnly: boolean): Promise<void> => {
         };
         const actionListener = (): void => finish();
 
+        hasRegisteredInputWaiter = true;
         window.addEventListener("keydown", keyboardListener);
         actionListeners.add(actionListener);
+
+        if (pendingInitialVirtualAction) {
+            pendingInitialVirtualAction = false;
+            queueMicrotask(triggerVirtualAction);
+        }
     });
 };
 

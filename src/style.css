@@ -82,6 +82,7 @@ canvas {
     color: rgba(255, 255, 255, 0.9);
     font: 700 clamp(15px, 3vw, 20px) / 1 sans-serif;
     letter-spacing: 0.08em;
+    touch-action: manipulation;
 }
 
 #action-button:active {

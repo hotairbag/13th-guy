@@ -499,11 +499,11 @@ const drawInitialScreen = (): void => {
     applyCRTEffect();
 };
 
-export const startRace = async (): Promise<void> => {
+export const startRace = async (skipStartPrompt = false): Promise<void> => {
     raceNumber = 1;
     z = 1;
     setState(GameState.Start);
-    await waitForEnter();
+    if (!skipStartPrompt) await waitForEnter();
     setState(GameState.Wait);
 
     setTimeout(() => {
@@ -523,6 +523,5 @@ export const init = async (): Promise<void> => {
     playTune(SFX_START);
     window.requestAnimationFrame(gameLoop);
 
-    setState(GameState.Start);
-    startRace();
+    startRace(hasTouchControls);
 };
