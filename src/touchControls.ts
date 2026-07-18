@@ -44,6 +44,10 @@ export const setHomeScreenVisible = (
         : touchCapable
           ? "Tap START to enter the race."
           : "Press any key to enter the race.";
+
+    // The home screen owns its CTA state. This prevents a hidden/disabled
+    // button from leaking in from gameplay, a respawn ad, or the loss screen.
+    if (visible && !waiting) setActionButtonVisible(true);
 };
 
 let activePointer: number | null = null;
