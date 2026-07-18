@@ -48,7 +48,7 @@ for (const assetPath of assetPaths) {
 
 fs.writeFileSync(
     "dist/client/_headers",
-    "/assets/*\n  Cache-Control: public, max-age=31536000, immutable\n",
+    "/assets/*\n  Cache-Control: no-cache, must-revalidate\n\n/publishox-logo.png\n  Cache-Control: no-cache, must-revalidate\n",
 );
 fs.writeFileSync("dist/client/.assetsignore", "wrangler.json\n.dev.vars\n");
 
@@ -78,9 +78,7 @@ export default {
         return new Response(request.method === "HEAD" ? null : body, {
             headers: {
                 "Content-Type": asset.contentType,
-                "Cache-Control": pathname === "/index.html"
-                    ? "no-cache"
-                    : "public, max-age=31536000, immutable",
+                "Cache-Control": "no-cache, must-revalidate",
                 "X-Content-Type-Options": "nosniff",
             },
         });
