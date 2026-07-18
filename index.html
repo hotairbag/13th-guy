@@ -19,14 +19,29 @@
                 <span class="banner-ad__cta">LEARN MORE</span>
             </div>
         </aside>
-        <div id="publisher-logo" aria-label="A game by Publishox">
-            <span>A GAME BY</span>
-            <img src="/publishox-logo.png" alt="Publishox" />
-        </div>
+        <section id="home-screen" aria-labelledby="home-screen-title">
+            <div class="home-screen__brand" aria-label="A game by Publishox">
+                <span>A GAME BY</span>
+                <img src="/publishox-logo.png" alt="Publishox" />
+            </div>
+            <div class="home-screen__hero">
+                <p class="home-screen__eyebrow">40 RUNNERS · 3 ROUNDS · 1 RULE</p>
+                <h1 id="home-screen-title">
+                    <span>DON'T BE THE</span>
+                    <strong><em>13TH</em> GUY</strong>
+                </h1>
+                <p class="home-screen__tagline">
+                    Race through the chaos. Qualify before the pack. Never
+                    finish thirteenth.
+                </p>
+            </div>
+            <p id="home-screen-instruction">Tap START to enter the race.</p>
+        </section>
         <canvas aria-label="13th Guy game"></canvas>
         <div id="touch-controls" aria-label="Touch controls">
             <div
                 id="joystick"
+                class="is-hidden"
                 role="application"
                 aria-label="Movement joystick. Drag in any direction to move."
             >
@@ -35,9 +50,9 @@
             <button
                 id="action-button"
                 type="button"
-                aria-label="Start or continue"
+                aria-label="Start game"
             >
-                GO
+                START
             </button>
         </div>
         <div

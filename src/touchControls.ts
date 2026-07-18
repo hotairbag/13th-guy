@@ -12,9 +12,10 @@ const actionButton = document.querySelector(
 const touchControls = document.querySelector(
     "#touch-controls",
 ) as HTMLDivElement;
-const publisherLogo = document.querySelector(
-    "#publisher-logo",
-) as HTMLDivElement;
+const homeScreen = document.querySelector("#home-screen") as HTMLElement;
+const homeInstruction = document.querySelector(
+    "#home-screen-instruction",
+) as HTMLParagraphElement;
 
 const touchCapable =
     navigator.maxTouchPoints > 0 ||
@@ -27,8 +28,22 @@ export const setActionButtonVisible = (visible: boolean): void => {
     actionButton.disabled = !visible;
 };
 
-export const setStartBrandVisible = (visible: boolean): void => {
-    publisherLogo.classList.toggle("is-hidden", !visible);
+export const setHomeScreenVisible = (
+    visible: boolean,
+    waiting = false,
+): void => {
+    homeScreen.classList.toggle("is-hidden", !visible);
+    document.documentElement.classList.toggle("home-active", visible);
+    actionButton.textContent = visible ? "START" : "GO";
+    actionButton.setAttribute(
+        "aria-label",
+        visible ? "Start game" : "Start or continue",
+    );
+    homeInstruction.textContent = waiting
+        ? "Entering the starting grid…"
+        : touchCapable
+          ? "Tap START to enter the race."
+          : "Press any key to enter the race.";
 };
 
 let activePointer: number | null = null;
@@ -39,6 +54,14 @@ const resetJoystick = (): void => {
     joystick.classList.remove("is-active");
     releaseVirtualDirection();
 };
+
+export const setJoystickVisible = (visible: boolean): void => {
+    joystick.classList.toggle("is-hidden", !visible);
+    if (!visible) resetJoystick();
+};
+
+setHomeScreenVisible(true);
+setJoystickVisible(false);
 
 const updateJoystick = (event: PointerEvent): void => {
     const rect = joystick.getBoundingClientRect();
